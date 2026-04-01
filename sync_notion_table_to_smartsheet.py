@@ -272,11 +272,24 @@ class NotionDatabaseToSmartsheet:
                 print(f"Error processing row {row_idx + 1}: {e}")
                 errors += 1
 
-        # Add rows to Smartsheet
+        # Clear existing rows from Smartsheet
+        print(f"Clearing existing rows from Smartsheet...")
+        sheet = self.smart.Sheets.get_sheet(sheet_id)
+        if sheet.rows:
+            row_ids = [row.id for row in sheet.rows]
+            if row_ids:
+                print(f"  Deleting {len(row_ids)} existing rows...")
+                try:
+                    self.smart.Sheets.delete_rows(sheet_id, row_ids)
+                    print(f"  Deleted {len(row_ids)} rows")
+                except Exception as e:
+                    print(f"  Warning: Error deleting rows: {e}")
+
+        # Add fresh rows to Smartsheet
         stats = {"added": 0, "errors": errors}
 
         if rows_to_add:
-            print(f"Adding {len(rows_to_add)} rows to Smartsheet...")
+            print(f"Adding {len(rows_to_add)} fresh rows to Smartsheet...")
             batch_size = 500
             for i in range(0, len(rows_to_add), batch_size):
                 batch = rows_to_add[i : i + batch_size]
