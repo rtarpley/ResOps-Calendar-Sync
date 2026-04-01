@@ -276,14 +276,21 @@ class NotionDatabaseToSmartsheet:
         print(f"Clearing existing rows from Smartsheet...")
         sheet = self.smart.Sheets.get_sheet(sheet_id)
         if sheet.rows:
-            row_ids = [row.id for row in sheet.rows]
+            row_ids = [row.id for row in sheet.rows if row.id is not None]
             if row_ids:
                 print(f"  Deleting {len(row_ids)} existing rows...")
-                try:
-                    self.smart.Sheets.delete_rows(sheet_id, row_ids)
-                    print(f"  Deleted {len(row_ids)} rows")
-                except Exception as e:
-                    print(f"  Warning: Error deleting rows: {e}")
+                # Delete in batches (Smartsheet has limits)
+                batch_size = 200
+                deleted_count = 0
+                for i in range(0, len(row_ids), batch_size):
+                    batch = row_ids[i : i + batch_size]
+                    try:
+                        self.smart.Sheets.delete_rows(sheet_id, batch)
+                        deleted_count += len(batch)
+                        print(f"    Deleted {deleted_count}/{len(row_ids)} rows")
+                    except Exception as e:
+                        print(f"    Warning: Error deleting batch: {e}")
+                print(f"  Total deleted: {deleted_count} rows")
 
         # Add fresh rows to Smartsheet
         stats = {"added": 0, "errors": errors}
