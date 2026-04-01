@@ -26,15 +26,15 @@ import smartsheet
 from dotenv import load_dotenv
 
 
-# Column mapping: Notion table column → Smartsheet column
+# Column mapping: Notion database property → Smartsheet column
 COLUMN_MAPPING = {
-    "name": "name",
-    "Lab flow": "Lab flow",
-    "date": "date",
-    "operator": "operater",  # Note: Smartsheet has typo "operater"
-    "tags": "tags",
-    "workcell": "workcell",
-    "#of plates": "# of plates",
+    "Name": "Name",
+    "Labflow": "Lab Flow",  # Notion: "Labflow" (one word) → Smartsheet: "Lab Flow" (two words)
+    "Date": "Date",
+    "Operator": "Operator",
+    "Tags": "Tags",
+    "Workcell": "Workcell",
+    "# of Plates": "# of Plates",
 }
 
 
